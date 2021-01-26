@@ -1,13 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Boss2Move : MonoBehaviour
 {
+    public int health;
+    public Slider healthbar;
+
     [Header("For SeeingPlayer (Red) ")]
     [SerializeField] private Vector2 lineofSite;
     [SerializeField] private LayerMask playerLayer;
     private bool canSeePlayer;
+
+    [Header("For Flip")]
+    public Transform PlayerDirectionCheck;
+    private bool PlayerDirection;
+    [SerializeField] private Vector2 size;
+    private bool facingToPlayer = true;
 
     [Header("For Jump")]
     [SerializeField] private Transform groundCheck;
@@ -27,17 +37,18 @@ public class Boss2Move : MonoBehaviour
     private bool ClosePlayer;
     [SerializeField] private Vector2 CloseArea;
     public static float moveDirection;
-    private bool facingToPlayer = true;
     public float speed;
 
     [Header("For ComboAttack")]
     private bool StartShooting = false;
+    public static bool BossDied = false;
 
     public static Rigidbody2D BossRb;
 
     void Start()
     {
         BossRb = GetComponent<Rigidbody2D>();
+        Target = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     void Update()
@@ -45,20 +56,22 @@ public class Boss2Move : MonoBehaviour
         isGrounded = Physics2D.OverlapBox(groundCheck.position, boxSize, 0, groundLayer);
         canSeePlayer = Physics2D.OverlapBox(transform.position, lineofSite, 0, playerLayer);
         ClosePlayer = Physics2D.OverlapBox(transform.position, CloseArea, 0, playerLayer);
-        Target = GameObject.FindGameObjectWithTag("Player").transform;
+        PlayerDirection = Physics2D.OverlapBox(PlayerDirectionCheck.position, size, 0, playerLayer);
+        healthbar.value = health;
 
-        if (Target.transform.position.x >= gameObject.transform.position.x)
-        {
-            facingToPlayer = false;
-        }
-        else if (Target.transform.position.x <= gameObject.transform.position.x)
+        if (PlayerDirection)
         {
             facingToPlayer = true;
+        }
+        else if (PlayerDirection == false)
+        {
+            facingToPlayer = false;
         }
 
         if(facingToPlayer == false)
         {
             Flip();
+            facingToPlayer = true;
         }
 
         if (isGrounded && !canSeePlayer)
@@ -106,6 +119,13 @@ public class Boss2Move : MonoBehaviour
             Flying = false;
             StayOnGround();
         }
+
+        if(health <= 0 || healthbar.value <= 0)
+        {
+            Destroy(healthbar.gameObject);
+            Destroy(gameObject);
+            BossDied = true;
+        }
     }
 
     void Fly()
@@ -143,6 +163,11 @@ public class Boss2Move : MonoBehaviour
         transform.Rotate(0, 180, 0);
     }
 
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
@@ -153,5 +178,8 @@ public class Boss2Move : MonoBehaviour
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(transform.position, CloseArea);
+
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireCube(PlayerDirectionCheck.position, size);
     }
 }

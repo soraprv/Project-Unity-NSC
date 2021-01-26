@@ -17,6 +17,9 @@ public class PressDialog : MonoBehaviour
     public float checkRaduis;
     public LayerMask whatIsPlayer;
 
+    public GameObject BGText;
+    public Rigidbody2D player;
+
     void Start()
     {
         
@@ -31,10 +34,12 @@ public class PressDialog : MonoBehaviour
         {
             StartCoroutine(Type());
         }
-
         if (textDisplay.text == sentences[index])
         {
             continueButton.SetActive(true);
+            BGText.SetActive(true);
+            player.constraints = RigidbodyConstraints2D.FreezeAll;
+
         }
     }
 
@@ -59,6 +64,10 @@ public class PressDialog : MonoBehaviour
         else
         {
             textDisplay.text = "";
+            continueButton.SetActive(false);
+            BGText.SetActive(false);
+            player.constraints = RigidbodyConstraints2D.None;
+            player.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
     }
 

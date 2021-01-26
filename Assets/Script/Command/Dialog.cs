@@ -12,6 +12,10 @@ public class Dialog : MonoBehaviour
 
     public GameObject continueButton;
 
+    public GameObject BGText;
+
+    public Rigidbody2D player;
+
     void Start()
     {
          StartCoroutine(Type());  
@@ -21,6 +25,8 @@ public class Dialog : MonoBehaviour
         if (textDisplay.text == sentences[index])
         {
             continueButton.SetActive(true);
+            BGText.SetActive(true);
+            player.constraints = RigidbodyConstraints2D.FreezeAll;
         }
        
     }
@@ -47,6 +53,9 @@ public class Dialog : MonoBehaviour
         {
             textDisplay.text = "";
             continueButton.SetActive(false);
+            BGText.SetActive(false);
+            player.constraints = RigidbodyConstraints2D.None;
+            player.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
     }
     

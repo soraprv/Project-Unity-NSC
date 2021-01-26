@@ -17,31 +17,27 @@ public class PlayerAttack : MonoBehaviour
     [Header("For BossAttackRange(Red)")]
     public float BossattackRangeX;
     public float BossattackRangeY;
+    public static bool InBossArea = false;
+    private bool ForCheckDebugInBossArea = false;
 
-    [Header("For ScanTypeOfEnemies(Blue)")]
-    [SerializeField] private Vector2 scansize;
+    [Header("For TypeOfMonsters")]
     [SerializeField] public LayerMask whatIsEnemies;
     [SerializeField] public LayerMask whatIsBoss;
-    private bool BossIsScaned;
-
-    private void Start()
-    {
-
-    }
 
     void Update()
     {
-        BossIsScaned = Physics2D.OverlapBox(transform.position, scansize, 0, whatIsBoss);
+        ForCheckDebugInBossArea = InBossArea;
+
         if (timeBtwAttack <= startTimeBtwAttack)
         {
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
-                if (BossIsScaned)
+                if (InBossArea)
                 {
                     Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(attackPos.position, new Vector2(BossattackRangeX, BossattackRangeY), 0, whatIsBoss);
                     for (int i = 0; i < enemiesToDamage.Length; i++)
                     {
-                        enemiesToDamage[i].GetComponent<BossMove>().TakeDamage(damage);
+                        enemiesToDamage[i].GetComponent<Boss2Move>().TakeDamage(damage);
                     }
                 }
                 else
@@ -69,9 +65,6 @@ public class PlayerAttack : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(attackPos.position, new Vector3(BossattackRangeX, BossattackRangeY, 1));
-
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(transform.position, scansize);
     }
 
 }

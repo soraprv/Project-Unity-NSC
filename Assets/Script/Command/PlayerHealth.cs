@@ -15,6 +15,9 @@ public class PlayerHealth : MonoBehaviour
     public static bool Healed;
     public static bool TouchEnemyJumping;
 
+    public GameObject GameOverGUI;
+
+    public static bool Died = false; 
 
     private void Start()
     {
@@ -50,12 +53,15 @@ public class PlayerHealth : MonoBehaviour
                 hearts[i].enabled = false;
             }
         }
+        
         if (health <= 0)
         {
-            GameOver();
+            StartCoroutine(GUI());
+            //gameObject.SetActive(false);
+            Died = true;
         }
+        
     }
-
     void TakeDamge()
     {
         health -= 1;
@@ -85,10 +91,18 @@ public class PlayerHealth : MonoBehaviour
             Destroy(ItemHeal);
         }
     }
-
-    void GameOver()
+    public void GameOver()
     {
+        
         Debug.Log("GAME OVER!");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+    
+    IEnumerator GUI()
+    {
+        yield return new WaitForSeconds(1.5f);
+        Time.timeScale = 0f;
+        GameOverGUI.SetActive(true);
+    }
+    
 }

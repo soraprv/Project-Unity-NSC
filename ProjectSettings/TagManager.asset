@@ -7,6 +7,10 @@ TagManager:
   - Boss
   - Enemies
   - Bullet
+  - BulletDirection1
+  - BulletDirection2
+  - BulletDirection3
+  - BulletDirection4
   layers:
   - Default
   - TransparentFX
@@ -23,8 +27,8 @@ TagManager:
   - Enemies
   - Bullet
   - Boss
-  - 
-  - 
+  - wall
+  - Box
   - 
   - 
   - 

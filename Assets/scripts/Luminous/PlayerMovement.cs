@@ -1,65 +1,180 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public CharacterController2D controller;
-    public Animator Luminous , Laminus;
+    public float maxSpeed = 3;
+    public float speed = 10f;
+    public float jumpPower = 15f;
+    public int extraJump = 1;
+    [SerializeField] LayerMask groundLayer;
+    [SerializeField] Rigidbody2D rb;
+    [SerializeField] Transform feet;
 
-    public float LuminousRunSpeed = 60f, LaminusRunSpeed = 40f;
+    int jumpCount = 0;
+    bool isGrounded;
+    float mx;
+    float jumpCoolDown;
 
-    float horizontalMove = 0f;
-    bool jump = false;
-    bool crouch = false;
-    bool IsLuminous = true;
+    public float dashDistance = 15f;
+    bool isDashing;
+    float doubleTapTime;
+    KeyCode lastKeyCode;
 
-    void Update()
+    public bool wallSliding;
+    public Transform wallCheckPoint;
+    public bool wallCheck;
+    public LayerMask wallLayerMask;
+
+    public Animator anim;
+
+    public bool facingRight = true;
+
+    private void Update()
     {
-        horizontalMove = Input.GetAxisRaw("Horizontal") * (IsLuminous? LuminousRunSpeed : LaminusRunSpeed);
-        Luminous.SetFloat("Speed",Mathf.Abs(horizontalMove));
-        Laminus.SetFloat("Speed",Mathf.Abs(horizontalMove));
+        if (mx > 0.1f)
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+            facingRight = true;
+        }
+        if (mx < -0.1f)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+            facingRight = false;
+        }
+
+        if (Input.GetButtonDown("Jump") && !wallSliding)
+        {
+            jump();
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            if (doubleTapTime > Time.time && lastKeyCode == KeyCode.A)
+            {
+                StartCoroutine(Dash(-1));
+            }
+            else
+            {
+                doubleTapTime = Time.time + 0.5f;
+            }
+            lastKeyCode = KeyCode.A;
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (doubleTapTime > Time.time && lastKeyCode == KeyCode.D)
+            {
+                StartCoroutine(Dash(1));
+            }
+            else
+            {
+                doubleTapTime = Time.time + 0.5f;
+            }
+            lastKeyCode = KeyCode.D;
+        }
+        anim.SetFloat("Speed", Mathf.Abs(Input.GetAxis("Horizontal")));
+
+
+        if (!isGrounded)
+        {
+            wallCheck = Physics2D.OverlapCircle(wallCheckPoint.position, 0.1f, wallLayerMask);
+
+            if ((facingRight && mx > 0.1f) || (!facingRight && mx < -0.1f))
+            {
+                if (wallCheck)
+                {
+                    HandleWallSliding();
+                }
+            }
+        }
+        CheckGround();
+    }
+    private void FixedUpdate()
+    {
+        mx = Input.GetAxis("Horizontal");
+        if (!isDashing)
+        {
+            rb.velocity = new Vector2(mx * speed, rb.velocity.y);
+            if (isGrounded)
+            {
+                rb.AddForce((Vector2.right * speed) * mx);
+            }
+            else
+            {
+                rb.AddForce((Vector2.right * speed / 2) * mx);
+            }
+            if (rb.velocity.x > maxSpeed)
+            {
+                rb.velocity = new Vector2(maxSpeed, rb.velocity.y);
+            }
+            if (rb.velocity.x < -maxSpeed)
+            {
+                rb.velocity = new Vector2(-maxSpeed, rb.velocity.y);
+            }
+        }
+
+
+        if (wallCheck == false || isGrounded)
+        {
+            anim.SetBool("IsClimb", false);
+            wallSliding = false;
+        }
+    }
+    void HandleWallSliding()
+    {
+        rb.velocity = new Vector2(rb.velocity.x, -0.7f);
+
+        anim.SetBool("IsClimb", true);
+
+        wallSliding = true;
 
         if (Input.GetButtonDown("Jump"))
         {
-            jump = true;
-            Luminous.SetBool("IsJumping", true);
-            Laminus.SetBool("IsJumping", true);
-        }
-        
-        if (Input.GetButtonDown("SwitchPlayer"))
-        {
-            gameObject.GetComponent<SwitchCharacterScript>().SwitchAvatar();
-            IsLuminous = !IsLuminous;
-        }
-
-        if (Input.GetButtonDown("Crouch"))
-        {
-            crouch = true;
-            Luminous.SetBool("IsCrouching", true);
-            Laminus.SetBool("IsCrouching", true);
-        }
-        else if (Input.GetButtonUp("Crouch"))
-        {
-            crouch = false;
-            Luminous.SetBool("IsCrouching", false);
-            Laminus.SetBool("IsCrouching", false);
+            if (facingRight)
+            {
+                rb.AddForce(new Vector2(-100, 125) * jumpPower);
+            }
+            else
+            {
+                rb.AddForce(new Vector2(100, 125) * jumpPower);
+            }
         }
     }
-
-    public void OnLanding()
+    void jump()
     {
-        Luminous.SetBool("IsJumping", false);
-        Laminus.SetBool("IsJumping", false);
+        if (isGrounded || jumpCount < extraJump)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpPower);
+            jumpCount++;
+        }
     }
-    public void OnCrouching(bool IsCrouching)
+    void CheckGround()
     {
-        Luminous.SetBool("IsCrouching", IsCrouching);
-        Laminus.SetBool("IsCrouching", IsCrouching);
+        if (Physics2D.OverlapCircle(feet.position, 0.5f, groundLayer))
+        {
+            isGrounded = true;
+            jumpCount = 0;
+            jumpCoolDown = Time.time + 0.2f;
+        }
+        else if (Time.time < jumpCoolDown)
+        {
+            isGrounded = true;
+        }
+        else
+        {
+            isGrounded = false;
+        }
     }
+    IEnumerator Dash(float direction)
+    {
+        isDashing = true;
+        rb.velocity = new Vector2(rb.velocity.x, 0f);
+        rb.AddForce(new Vector2(dashDistance * direction, 0f), ForceMode2D.Impulse);
+        float gravity = rb.gravityScale;
+        rb.gravityScale = 0;
+        yield return new WaitForSeconds(0.4f);
+        isDashing = false;
+        rb.gravityScale = gravity;
 
-    void FixedUpdate(){
-        controller.Move(horizontalMove * Time.fixedDeltaTime,crouch, jump);
-        jump = false;
     }
 }
