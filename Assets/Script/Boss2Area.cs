@@ -7,12 +7,13 @@ public class Boss2Area : MonoBehaviour
     public GameObject Gate;
     public GameObject Boss;
     public GameObject BossHealthBar;
+    public GameObject SpikeBeforePortal;
     [SerializeField] private Vector2 Size;
     [SerializeField] private LayerMask Player;
     private bool PlayerInArea;
     public static bool closegate = false;
 
-    private bool IsBossDied;
+    public static bool IsBossDied;
     public Transform PlayerTransform;
     public Transform PortalTransform;
     private bool TeleportFinished = false;
@@ -26,6 +27,7 @@ public class Boss2Area : MonoBehaviour
         {
             StartCoroutine(TeleportPlayer());
             TeleportFinished = true;
+            Destroy(SpikeBeforePortal);
         }
 
         if (PlayerInArea)

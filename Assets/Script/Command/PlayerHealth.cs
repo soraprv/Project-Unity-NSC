@@ -6,27 +6,40 @@ using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
+    [Header("For Health Systems")]
     public int health;
     public int numOfHearts;
+    public int PlayerNewMaxHealth;
     public Image[] hearts;
     public Sprite fullHeart;
     public Sprite emptyHeart;
     public GameObject ItemHeal;
     public static bool Healed;
-    public static bool TouchEnemyJumping;
+    public static bool Died = false;
 
+    [Header("For GameOverGUI")]
     public GameObject GameOverGUI;
 
-    public static bool Died = false; 
+    [Header("For CheckPoint System")]
+    private GameMaster gm;
 
     private void Start()
     {
         Healed = false;
-        TouchEnemyJumping = false;
+        gm = GameObject.FindGameObjectWithTag("GM").GetComponent<GameMaster>();
+        transform.position = gm.lastCheckpointPos;
     }
 
     void Update()
     {
+        /*
+        if(NewMaxHealth.GetNewMaxHealth == true)
+        {
+            numOfHearts = PlayerNewMaxHealth;
+            health = PlayerNewMaxHealth;
+        }
+        */
+
         if (health > numOfHearts)
         {
             health = numOfHearts;
@@ -56,10 +69,11 @@ public class PlayerHealth : MonoBehaviour
         
         if (health <= 0)
         {
-            StartCoroutine(GUI());
-            //gameObject.SetActive(false);
+            gameObject.SetActive(false);
             Died = true;
         }
+
+        RegenWhenBoss2Died();
         
     }
     void TakeDamge()
@@ -70,6 +84,14 @@ public class PlayerHealth : MonoBehaviour
     void Heal()
     {
         health += 1;
+    }
+
+    void RegenWhenBoss2Died()
+    {
+        if (Boss2Area.IsBossDied == true)
+        {
+            health = numOfHearts;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D col)
@@ -95,14 +117,9 @@ public class PlayerHealth : MonoBehaviour
     {
         
         Debug.Log("GAME OVER!");
+        transform.position = gm.lastCheckpointPos;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-    
-    IEnumerator GUI()
-    {
-        yield return new WaitForSeconds(1.5f);
-        Time.timeScale = 0f;
-        GameOverGUI.SetActive(true);
+        Died = false;
     }
     
 }

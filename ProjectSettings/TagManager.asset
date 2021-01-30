@@ -11,6 +11,7 @@ TagManager:
   - BulletDirection2
   - BulletDirection3
   - BulletDirection4
+  - GM
   layers:
   - Default
   - TransparentFX

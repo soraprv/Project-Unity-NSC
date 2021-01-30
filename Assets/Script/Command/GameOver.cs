@@ -5,13 +5,6 @@ using UnityEngine;
 public class GameOver : MonoBehaviour
 {
     public GameObject GameOverGUI;
-
-    void Start()
-    {
-        
-    }
-
-    
     void Update()
     {
         if (PlayerHealth.Died == true)

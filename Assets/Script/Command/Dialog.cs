@@ -30,7 +30,6 @@ public class Dialog : MonoBehaviour
         }
        
     }
-
     IEnumerator Type()
     {
         foreach(char letter in sentences[index].ToCharArray())
