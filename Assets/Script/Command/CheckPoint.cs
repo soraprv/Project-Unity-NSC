@@ -5,6 +5,7 @@ using UnityEngine;
 public class CheckPoint : MonoBehaviour
 {
     private GameMaster gm;
+    
 
     void Start()
     {
@@ -17,6 +18,7 @@ public class CheckPoint : MonoBehaviour
         {
             gm.lastCheckpointPos = transform.position;
             Debug.Log("CheckPoint assed");
+            
         }
     }
 }

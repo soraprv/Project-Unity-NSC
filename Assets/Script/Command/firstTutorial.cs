@@ -22,6 +22,7 @@ public class firstTutorial : MonoBehaviour
     void Start()
     {
         StartCoroutine(Type());
+        player.constraints = RigidbodyConstraints2D.FreezeAll;
     }
     void Update()
     {

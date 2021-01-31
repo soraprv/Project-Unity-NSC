@@ -16,12 +16,25 @@ public class Dialog : MonoBehaviour
 
     public Rigidbody2D player;
 
+    private bool InArea;
+    public Transform Object;
+    public float checkRaduis;
+    public LayerMask whatIsPlayer;
+
     void Start()
     {
-         StartCoroutine(Type());  
+           
+    }
+    void FixedUpdate()
+    {
+        InArea = Physics2D.OverlapCircle(Object.position, checkRaduis, whatIsPlayer);
     }
     void Update()
     {
+        if (InArea && index < sentences.Length - 1)
+        {
+            StartCoroutine(Type());
+        }
         if (textDisplay.text == sentences[index])
         {
             continueButton.SetActive(true);

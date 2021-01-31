@@ -20,6 +20,9 @@ public class PressDialog : MonoBehaviour
     public GameObject BGText;
     public Rigidbody2D player;
 
+    public GameObject Press;
+    private bool check = false;
+
     void Start()
     {
         
@@ -30,15 +33,36 @@ public class PressDialog : MonoBehaviour
     }
     void Update()
     {
+        if (InArea)
+        {
+            if(check == false)
+            {
+                Press.SetActive(true);
+            }
+            if (check == true)
+            {
+                Press.SetActive(false);
+            }
+        }
+        else
+        {
+            Press.SetActive(false);
+        }
+
         if (InArea && index < sentences.Length - 1 && Input.GetKeyDown(KeyCode.F))
         {
+            check = true;
             StartCoroutine(Type());
+            BGText.SetActive(true);
+            player.constraints = RigidbodyConstraints2D.FreezeAll;
+            Press.SetActive(false);
         }
+        
         if (textDisplay.text == sentences[index])
         {
             continueButton.SetActive(true);
-            BGText.SetActive(true);
-            player.constraints = RigidbodyConstraints2D.FreezeAll;
+            //BGText.SetActive(true);
+            //player.constraints = RigidbodyConstraints2D.FreezeAll;
 
         }
     }
@@ -66,6 +90,7 @@ public class PressDialog : MonoBehaviour
             textDisplay.text = "";
             continueButton.SetActive(false);
             BGText.SetActive(false);
+            Press.SetActive(true);
             player.constraints = RigidbodyConstraints2D.None;
             player.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
