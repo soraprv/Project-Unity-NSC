@@ -25,23 +25,25 @@ public class Boss2Area : MonoBehaviour
 
         if (IsBossDied == true && TeleportFinished == false)
         {
+            Boss.gameObject.SetActive(false);
+            BossHealthBar.gameObject.SetActive(false);
             StartCoroutine(TeleportPlayer());
             TeleportFinished = true;
-            Destroy(SpikeBeforePortal);
+            SpikeBeforePortal.SetActive(false);
         }
 
-        if (PlayerInArea)
+        if (PlayerInArea && !IsBossDied)
         {
-            PlayerAttack.InBossArea = true;
+            PlayerAttack.InBoss2Area = true;
             closegate = true;
             Gate.gameObject.SetActive(true);
             Boss.gameObject.SetActive(true);
             BossHealthBar.gameObject.SetActive(true);
         }
 
-        else if (!PlayerInArea)
+        else if (!PlayerInArea && !IsBossDied)
         {
-            PlayerAttack.InBossArea = false;
+            PlayerAttack.InBoss2Area = false;
             closegate = false;
             Gate.gameObject.SetActive(false);
             Boss.gameObject.SetActive(false);
@@ -53,6 +55,7 @@ public class Boss2Area : MonoBehaviour
     {
         yield return new WaitForSeconds(3);
         PlayerTransform.position = PortalTransform.position;
+        PlayerAttack.InBoss2Area = false;
     }
 
     private void OnDrawGizmosSelected()

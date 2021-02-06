@@ -43,12 +43,17 @@ public class Boss2Move : MonoBehaviour
     private bool StartShooting = false;
     public static bool BossDied = false;
 
+    [Header("For SoundEffect")]
+    public GameObject sound;
+    private AudioSource soundEffect;
+
     public static Rigidbody2D BossRb;
 
     void Start()
     {
         BossRb = GetComponent<Rigidbody2D>();
         Target = GameObject.FindGameObjectWithTag("Player").transform;
+        soundEffect = sound.GetComponent<AudioSource>();
     }
 
     void Update()
@@ -122,8 +127,6 @@ public class Boss2Move : MonoBehaviour
 
         if(health <= 0 || healthbar.value <= 0)
         {
-            Destroy(healthbar.gameObject);
-            Destroy(gameObject);
             BossDied = true;
         }
     }
@@ -165,6 +168,7 @@ public class Boss2Move : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        soundEffect.Play();
         health -= damage;
     }
 

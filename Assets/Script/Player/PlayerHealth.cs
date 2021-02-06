@@ -9,7 +9,7 @@ public class PlayerHealth : MonoBehaviour
     [Header("For Health Systems")]
     public int health;
     public int numOfHearts;
-    public int PlayerNewMaxHealth;
+    private int PlayerNewMaxHealth;
     public Image[] hearts;
     public Sprite fullHeart;
     public Sprite emptyHeart;
@@ -23,22 +23,27 @@ public class PlayerHealth : MonoBehaviour
     [Header("For CheckPoint System")]
     private GameMaster gm;
 
+    [Header("For SoundEffect")]
+    public GameObject sound;
+    private AudioSource soundEffect;
+
     private void Start()
     {
         Healed = false;
         gm = GameObject.FindGameObjectWithTag("GM").GetComponent<GameMaster>();
+        soundEffect = sound.GetComponent<AudioSource>();
         transform.position = gm.lastCheckpointPos;
     }
 
     void Update()
     {
-        /*
-        if(NewMaxHealth.GetNewMaxHealth == true)
+        if(NewStatus.GetNewMaxHealth == true)
         {
+            PlayerNewMaxHealth = numOfHearts + NewStatus.plusHealth;
             numOfHearts = PlayerNewMaxHealth;
             health = PlayerNewMaxHealth;
+            NewStatus.GetNewMaxHealth = false;
         }
-        */
 
         if (health > numOfHearts)
         {
@@ -78,6 +83,7 @@ public class PlayerHealth : MonoBehaviour
     }
     void TakeDamge()
     {
+        soundEffect.Play();
         health -= 1;
     }
 

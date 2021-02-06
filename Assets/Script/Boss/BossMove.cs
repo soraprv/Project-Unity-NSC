@@ -7,7 +7,7 @@ public class BossMove : MonoBehaviour
 {
     public int health;
     public float speed;
-    ///public Slider healthBar;
+    public Slider healthBar;
 
     [Header("For SeeingPlayer")]
     [SerializeField] private Vector2 lineofSite;
@@ -37,8 +37,7 @@ public class BossMove : MonoBehaviour
     [Header("For Item drop")]
     ///public GameObject HealFromBoss;
 
-    [Header("For Animation and Effects")]
-    ///public GameObject bloodEffect;
+    public static bool BossDied = false;
 
     private Rigidbody2D rb;
 
@@ -62,18 +61,7 @@ public class BossMove : MonoBehaviour
         canSeePlayer = Physics2D.OverlapBox(transform.position, lineofSite, 0, playerLayer);
         isGrounded = Physics2D.OverlapBox(groundCheck.position, boxSize, 0, groundLayer);
         checkingWall = Physics2D.OverlapCircle(wallCheckpoint.position, circleRadius, groundLayer);
-        ///healthBar.value = health;
-
-        /*
-        if(BossArea.PlayerInBossArea == true)
-        {
-            healthBar.gameObject.SetActive(true);
-        }
-        else
-        {
-            healthBar.gameObject.SetActive(false);
-        }
-        */
+        healthBar.value = health;
 
         if (BossJumpCount >= 3)
         {
@@ -106,9 +94,10 @@ public class BossMove : MonoBehaviour
             Flip();
         }
 
-        if (health <= 0 /* || healthBar.value <= 0*/)
+        if (health <= 0  || healthBar.value <= 0 )
         {
-            ///Destroy(healthBar.gameObject);
+            BossDied = true;
+            Destroy(healthBar.gameObject);
             Destroy(gameObject);
         }
     }
@@ -132,8 +121,8 @@ public class BossMove : MonoBehaviour
     public void TakeDamage(int damage)
     {
         health -= damage;
-        Debug.Log("damage Taken !");
     }
+
     void CheckmoveDirection()
     {
         if (target.transform.position.x >= gameObject.transform.position.x)

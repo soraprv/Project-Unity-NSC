@@ -31,12 +31,23 @@ public class EnemyJumping : MonoBehaviour
     [SerializeField] private LayerMask playerLayer;
     private bool canSeePlayer;
 
+    [Header("For Point")]
+    public int pointDrop;
+    public GameObject point;
+    public ParticleSystem pointparticles;
+    public GameObject Droppoint;
+
     [Header("Other")]
     private Rigidbody2D enemyRB;
+
+    [Header("For SoundEffect")]
+    public GameObject sound;
+    private AudioSource soundEffect;
 
     private void Start()
     {
         enemyRB = GetComponent<Rigidbody2D>();
+        soundEffect = sound.GetComponent<AudioSource>();
     }
 
     private void FixedUpdate()
@@ -66,7 +77,10 @@ public class EnemyJumping : MonoBehaviour
 
         if (health <= 0)
         {
-            Destroy(gameObject);
+            pointparticles.emission.SetBurst(0, new ParticleSystem.Burst(0, pointDrop));
+            Instantiate(point, Droppoint.transform.position, Quaternion.identity);
+            Instantiate(pointparticles, Droppoint.transform.position, Quaternion.identity);
+            gameObject.SetActive(false);
         }
     }
 
@@ -119,6 +133,7 @@ public class EnemyJumping : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        soundEffect.Play();
         dazedTime = startDazedTime;
         health -= damage;
         Debug.Log("damage Taken !");

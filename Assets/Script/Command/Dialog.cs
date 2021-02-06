@@ -23,7 +23,9 @@ public class Dialog : MonoBehaviour
 
     void Start()
     {
-           
+        StartCoroutine(Type());
+        player.constraints = RigidbodyConstraints2D.FreezeAll;
+
     }
     void FixedUpdate()
     {
@@ -31,17 +33,17 @@ public class Dialog : MonoBehaviour
     }
     void Update()
     {
-        if (InArea && index < sentences.Length - 1)
-        {
-            StartCoroutine(Type());
-        }
         if (textDisplay.text == sentences[index])
         {
             continueButton.SetActive(true);
             BGText.SetActive(true);
             player.constraints = RigidbodyConstraints2D.FreezeAll;
         }
-       
+        if (textDisplay.text == sentences[index])
+        {
+            continueButton.SetActive(true); 
+        }
+
     }
     IEnumerator Type()
     {

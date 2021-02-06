@@ -1,9 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Boss3Move : MonoBehaviour
 {
+    public int health;
+    public Slider healthbar;
+
     [Header("For SeeingPlayer (Red) ")]
     [SerializeField] private Vector2 lineofSite;
     [SerializeField] private LayerMask playerLayer;
@@ -34,6 +38,8 @@ public class Boss3Move : MonoBehaviour
 
     public static Rigidbody2D BossRb;
 
+    public static bool BossDied = false;
+
     void Start()
     {
         BossRb = GetComponent<Rigidbody2D>();
@@ -47,6 +53,7 @@ public class Boss3Move : MonoBehaviour
     void Update()
     {
         canSeePlayer = Physics2D.OverlapBox(transform.position, lineofSite, 0, playerLayer);
+        healthbar.value = health;
 
         if (canSeePlayer && StartShooting == true)
         {
@@ -66,7 +73,12 @@ public class Boss3Move : MonoBehaviour
         {
             StartCoroutine(StopForAMoment());
         }
-
+        if (health <= 0 || healthbar.value <= 0)
+        {
+            BossDied = true;
+            Destroy(healthbar.gameObject);
+            Destroy(gameObject);
+        }
     }
 
     IEnumerator StopForAMoment()
@@ -153,6 +165,11 @@ public class Boss3Move : MonoBehaviour
         Instantiate(bullet2, transform.position, Quaternion.identity);
         Instantiate(bullet3, transform.position, Quaternion.identity);
         Instantiate(bullet4, transform.position, Quaternion.identity);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
     }
 
     private void OnDrawGizmosSelected()

@@ -10,18 +10,24 @@ public class SwitchCharacterScript : MonoBehaviour {
 	// variable contains which avatar is on and active
 	int whichAvatarIsOn = 1;
 
+    // variable for SoundEffect
+    public GameObject sound;
+    private AudioSource soundeffect;
+
 	// Use this for initialization
 	void Start () {
 
 		// anable first avatar and disable another one
 		avatar1.gameObject.SetActive (true);
 		avatar2.gameObject.SetActive (false);
+
+        soundeffect = sound.GetComponent<AudioSource>();
 	}
 
 	// public method to switch avatars by pressing UI button
 	public void SwitchAvatar()
 	{
-
+        soundeffect.Play();
 		// processing whichAvatarIsOn variable
 		switch (whichAvatarIsOn) {
 

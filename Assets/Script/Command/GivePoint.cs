@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewMaxHealth : MonoBehaviour
+public class GivePoint : MonoBehaviour
 {
-    public static bool GetNewMaxHealth;
-
-    private void Start()
-    {
-        GetNewMaxHealth = false;
-    }
+    public int PointValue;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.tag == "Player")
         {
-            GetNewMaxHealth = true;
+            PointSystem.Point += PointValue;
+            gameObject.SetActive(false);
         }
     }
 }

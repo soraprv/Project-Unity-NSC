@@ -79,6 +79,9 @@ TagManager:
   - name: Grass
     uniqueID: 475082947
     locked: 0
+  - name: Particle
+    uniqueID: 3980699591
+    locked: 0
   - name: Forground
     uniqueID: 239054085
     locked: 0

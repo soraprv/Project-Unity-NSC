@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class PressDialog : MonoBehaviour
+public class AutoDialog : MonoBehaviour
 {
     public TextMeshProUGUI textDisplay;
     public string[] sentences;
@@ -12,66 +12,59 @@ public class PressDialog : MonoBehaviour
 
     public GameObject continueButton;
 
+    public GameObject BGText;
+
+    public Rigidbody2D player;
+
     private bool InArea;
-    public Transform Npc;
+    public Transform Object;
     public float checkRaduis;
     public LayerMask whatIsPlayer;
 
-    public GameObject BGText;
-    public Rigidbody2D player;
-
-    public GameObject Press;
     private bool check = false;
+
+    public static int start = 0;
+    public GameObject key;
 
     void Start()
     {
         
     }
+
     void FixedUpdate()
     {
-        InArea = Physics2D.OverlapCircle(Npc.position, checkRaduis, whatIsPlayer);
+        InArea = Physics2D.OverlapCircle(Object.position, checkRaduis, whatIsPlayer);
     }
     void Update()
     {
         if (InArea)
         {
-            if(check == false)
-            {
-                Press.SetActive(true);
-            }
-            if (check == true)
-            {
-                Press.SetActive(false);
-            }
+            check = true;
         }
         else
         {
-            Press.SetActive(false);
+            check = false;
         }
-
-        if (InArea && index < sentences.Length - 1 && Input.GetKeyDown(KeyCode.F))
+        if (index < sentences.Length - 1 && check == true && AutoDialog.start == 1)
         {
-            check = true;
             StartCoroutine(Type());
             BGText.SetActive(true);
             player.constraints = RigidbodyConstraints2D.FreezeAll;
-            Press.SetActive(false);
+            
         }
-        
+
         if (textDisplay.text == sentences[index])
         {
             continueButton.SetActive(true);
+           
         }
-        
     }
-
     IEnumerator Type()
     {
         foreach (char letter in sentences[index].ToCharArray())
         {
             textDisplay.text += letter;
             yield return new WaitForSeconds(typingSpeed);
-            
         }
     }
     public void NextSentence()
@@ -89,11 +82,10 @@ public class PressDialog : MonoBehaviour
             textDisplay.text = "";
             continueButton.SetActive(false);
             BGText.SetActive(false);
-            Press.SetActive(true);
+            start = 0;
+            Destroy(key);
             player.constraints = RigidbodyConstraints2D.None;
             player.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
     }
-
-
 }

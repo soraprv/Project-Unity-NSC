@@ -21,6 +21,10 @@ public class OpenGate1 : MonoBehaviour
         {
             Gate.gameObject.SetActive(true);
         }
+        else if (!BoxTouched)
+        {
+            Gate.gameObject.SetActive(true);
+        }
     }
 
     private void OnDrawGizmosSelected()
