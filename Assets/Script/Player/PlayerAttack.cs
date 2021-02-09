@@ -30,7 +30,13 @@ public class PlayerAttack : MonoBehaviour
 
     [Header("For TypeOfMonsters")]
     [SerializeField] public LayerMask whatIsEnemies;
+    [SerializeField] public LayerMask whatIsEnemies2;
     [SerializeField] public LayerMask whatIsBoss;
+
+    [Header("For ScanEnemies")]
+    private bool Enemies1_InArea;
+    private bool Enemies2_InArea;
+    public Vector2 Size;
 
     [Header("Animator")]
     public Animator animatorLunimous;
@@ -41,13 +47,23 @@ public class PlayerAttack : MonoBehaviour
         ForCheckDebugInBoss2Area = InBoss2Area;
         ForCheckDebugInBoss3Area = InBoss3Area;
         ForCheckDebugInBoss4Area = InBoss4Area;
+        
+  
+        Enemies1_InArea = Physics2D.OverlapBox(attackPos.position, Size, 0, whatIsEnemies);
+        Enemies2_InArea = Physics2D.OverlapBox(attackPos.position, Size, 0, whatIsEnemies2);
 
         if (timeBtwAttack <= 0)
         {
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
-                animatorLunimous.SetTrigger("Attack");
-                animatorEligos.SetTrigger("Attack");
+                if (GameObject.Find("Players").GetComponent<SimpleMove>().IsLuminous)
+                {
+                    animatorLunimous.SetTrigger("Attack");
+                }
+                else
+                {
+                    animatorEligos.SetTrigger("Attack");
+                }
 
                 if (InBoss2Area)
                 {
@@ -138,5 +154,7 @@ public class PlayerAttack : MonoBehaviour
                 1
              )
         );
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(transform.position, Size);
     }
 }

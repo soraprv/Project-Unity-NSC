@@ -13,6 +13,9 @@ public class SimpleMove : MonoBehaviour
     public float jumpforce;
     private float moveInput;
     private int extraJumps;
+    public GameObject DoubleJump_BW;
+    public GameObject DoubleJumpGameObject;
+    private Image DobleJumpCD;
 
     public static Rigidbody2D rb;
 
@@ -23,7 +26,7 @@ public class SimpleMove : MonoBehaviour
     public Transform groundCheck;
     public float checkRadius;
     public LayerMask whatIsGround;
-    
+
 
 
     [Header("RunSpeed")]
@@ -33,35 +36,88 @@ public class SimpleMove : MonoBehaviour
     private float NewEligosRunSpeed;
 
     // variable for SwitchPlayerCooldown
+
     [Header("SwitchPlayerCooldown")]
-    private float CoolDown;
+    private float SwitchCoolDown;
     public float startTimeCoolDown;
     public Image SwitchPlayerCD;
-    private bool isCoolDown = false;
+    private bool SwitchPlayerisCoolDown = false;
 
-    //dash
+    // variable for dash
+
     [Header("Dash")]
-    public float dashDistance = 15f;
-    bool isDashing;
-    float doubleTapTime;
-    KeyCode lastKeyCode;
+    private float dashSpeed;
+    public float NormaldashSpeed;
+    private float dashTime;
+    public float startDashTime;
+    private int direction;
+    public float startDashCoolDown;
+    private float DashCoolDown;
+    public GameObject DashCD_BW;
+    public GameObject DashCDGameObject;
+    private Image DashCD;
+    private bool DashisCoolDown = false;
+
+    [Header("gride")]
+    public float startgrideTime;
+    public float startgrideCoolDown;
+    private float grideTime;
+    private int gridedirection;
+    private float grideCoolDown;
+    public GameObject Glide_BW;
+    public GameObject GlideGameObject;
+    private Image GlideCD;
+
+    [Header("stomp")]
+    public float startstompTime;
+    public float startstompCoolDown;
+    private float stompTime;
+    private int stompdirection;
+    private float stompCoolDown;
+    public GameObject Stomp_BW;
+    public GameObject StompGameObject;
+    private Image StompCD;
+    private bool StompisCoolDown = false;
 
     void Start()
     {
-        extraJumps = IsLuminous? 0 : 1;
-        
+        extraJumps = IsLuminous ? 0 : 1;
+
         rb = GetComponent<Rigidbody2D>();
 
         SwitchPlayerCD.fillAmount = 0;
+
+        DobleJumpCD = DoubleJump_BW.GetComponent<Image>();
+        DobleJumpCD.fillAmount = 0;
+
+        DashCD = DashCD_BW.GetComponent<Image>();
+        DashCD.fillAmount = 0;
+        dashTime = startDashTime;
+
+        GlideCD = Glide_BW.GetComponent<Image>();
+        GlideCD.fillAmount = 0;
+        grideTime = startgrideTime;
+
+        stompTime = startstompTime;
+        StompCD = Stomp_BW.GetComponent<Image>();
+        StompCD.fillAmount = 0;
     }
 
     void FixedUpdate()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
-        moveInput = Input.GetAxis("Horizontal") ;
+        moveInput = Input.GetAxis("Horizontal");
         rb.velocity = new Vector2(moveInput * (IsLuminous ? LuminousRunSpeed : EligosRunSpeed), rb.velocity.y);
-        animatorLuminous.SetFloat("Speed", Mathf.Abs(moveInput * LuminousRunSpeed));
-        animatorEligos.SetFloat("Speed", Mathf.Abs(moveInput * EligosRunSpeed));
+        if (IsLuminous)
+        {
+            animatorLuminous.SetFloat("Speed", Mathf.Abs(moveInput * LuminousRunSpeed));
+            ShowSkillLuminious();
+        }
+        else
+        {
+            animatorEligos.SetFloat("Speed", Mathf.Abs(moveInput * EligosRunSpeed));
+            ShowSkillEligos();
+        }
 
         if (facingRight == false && moveInput > 0)
         {
@@ -70,20 +126,6 @@ public class SimpleMove : MonoBehaviour
         else if (facingRight == true && moveInput < 0)
         {
             Flip();
-        }
-
-        //dash
-        if (!isDashing)
-        {
-            rb.velocity = new Vector2(moveInput *  (IsLuminous ? LuminousRunSpeed : EligosRunSpeed), rb.velocity.y);
-            if (isGrounded)
-            {
-                rb.AddForce((Vector2.right * (IsLuminous ? LuminousRunSpeed : EligosRunSpeed)) * moveInput);
-            }
-            else
-            {
-                rb.AddForce((Vector2.right *  (IsLuminous ? LuminousRunSpeed : EligosRunSpeed) / 2) * moveInput);
-            }
         }
     }
 
@@ -104,32 +146,32 @@ public class SimpleMove : MonoBehaviour
         }
 
         // SwitchPlayer with CoolDown
-        if (CoolDown <= 0)
+        if (SwitchCoolDown <= 0)
         {
-            if (Input.GetButtonDown("SwitchPlayer") && isCoolDown == false)
+            if (Input.GetButtonDown("SwitchPlayer") && SwitchPlayerisCoolDown == false)
             {
                 gameObject.GetComponent<SwitchCharacterScript>().SwitchAvatar();
                 IsLuminous = !IsLuminous;
-                isCoolDown = true;
+                SwitchPlayerisCoolDown = true;
                 SwitchPlayerCD.fillAmount = 1;
-                CoolDown = startTimeCoolDown;
+                SwitchCoolDown = startTimeCoolDown;
             }
         }
         else
         {
-            if (isCoolDown)
+            if (SwitchPlayerisCoolDown)
             {
                 SwitchPlayerCD.fillAmount -= 1 / startTimeCoolDown * Time.deltaTime;
                 if (SwitchPlayerCD.fillAmount <= 0)
                 {
                     SwitchPlayerCD.fillAmount = 0;
-                    isCoolDown = false;
+                    SwitchPlayerisCoolDown = false;
                 }
             }
-            CoolDown -= Time.deltaTime;
+            SwitchCoolDown -= Time.deltaTime;
         }
 
-        //Jump
+        //Jump and DoubleJump
         if (isGrounded == true)
         {
             extraJumps = IsLuminous ? 0 : 1;
@@ -140,7 +182,7 @@ public class SimpleMove : MonoBehaviour
             rb.velocity = Vector2.up * jumpforce;
             extraJumps--;
         }
-        else if(Input.GetKeyDown(KeyCode.Space) && extraJumps > 0)
+        else if (Input.GetKeyDown(KeyCode.Space) && extraJumps > 0)
         {
             rb.velocity = Vector2.up * jumpforce;
             extraJumps--;
@@ -150,31 +192,175 @@ public class SimpleMove : MonoBehaviour
             rb.velocity = Vector2.up * jumpforce;
         }
 
-        //Dash
-        if (Input.GetKeyDown(KeyCode.A))
+        //Luminous Dash/ Stomp/ Climb
+        if (IsLuminous)
         {
-            if(doubleTapTime > Time.time && lastKeyCode == KeyCode.A)
+            if (direction == 0)
             {
-                StartCoroutine(Dash(-1f));
+                if (DashCoolDown <= 0)
+                {
+                    if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A) && DashisCoolDown == false)
+                    {
+                        animatorLuminous.SetTrigger("Dash");
+                        direction = 1;
+                        DashisCoolDown = true;
+                        DashCD.fillAmount = 1;
+                        DashCoolDown = startDashCoolDown;
+                    }
+                    else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.D) && DashisCoolDown == false)
+                    {
+                        animatorLuminous.SetTrigger("Dash");
+                        direction = 2;
+                        DashisCoolDown = true;
+                        DashCD.fillAmount = 1;
+                        DashCoolDown = startDashCoolDown;
+                    }
+                }
+                else
+                {
+                    if (DashisCoolDown)
+                    {
+                        DashCD.fillAmount -= 1 / DashCoolDown * Time.deltaTime;
+                        if (DashCD.fillAmount <= 0)
+                        {
+                            DashCD.fillAmount = 0;
+                            DashisCoolDown = false;
+                        }
+                    }
+                    DashCoolDown -= Time.deltaTime;
+                }
             }
             else
             {
-                doubleTapTime = Time.time + 0.5f;
+                if (dashTime <= 0)
+                {
+                    direction = 0;
+                    dashTime = startDashTime;
+                    dashSpeed = 0f;
+                }
+                else
+                {
+                    dashTime -= Time.deltaTime;
+                    dashSpeed = NormaldashSpeed;
+                    if (direction == 1)
+                    {
+                        transform.Translate(Time.deltaTime * dashSpeed * -1f, 0, 0);
+                    }
+                    else if (direction == 2)
+                    {
+                        transform.Translate(Time.deltaTime * dashSpeed * 1f, 0, 0);
+                    }
+                }
             }
-            lastKeyCode = KeyCode.A;
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            if (doubleTapTime > Time.time && lastKeyCode == KeyCode.D)
+
+
+            if (stompdirection == 0)
             {
-                StartCoroutine(Dash(1f));
+                if (stompCoolDown <= 0)
+                {
+                    if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.S) && StompisCoolDown == false)
+                    {
+                        stompdirection = 1;
+                        StompisCoolDown = true;
+                        StompCD.fillAmount = 1;
+                        stompCoolDown = startstompCoolDown;
+                        animatorLuminous.SetBool("IsStomp",true);
+                    }
+                }
+                else
+                {
+                    if (StompisCoolDown)
+                    {
+                        StompCD.fillAmount -= 1 / stompCoolDown * Time.deltaTime;
+                        if (StompCD.fillAmount <= 0)
+                        {
+                            StompCD.fillAmount = 0;
+                            StompisCoolDown = false;
+                        }
+                    }
+                    stompCoolDown -= Time.deltaTime;
+                }
             }
             else
             {
-                doubleTapTime = Time.time + 0.5f;
+                if (stompTime <= 0)
+                {
+                    stompdirection = 0;
+                    stompTime = startstompTime;
+                    rb.gravityScale = 3;
+                    animatorLuminous.SetBool("IsStomp",false);
+                }
+                else
+                {
+                    stompTime -= Time.deltaTime;
+                    if (stompdirection == 1)
+                    {
+                        rb.gravityScale = 10;
+                    }
+                }
             }
-            lastKeyCode = KeyCode.D;
         }
+        else //Eligos DoubleJump^ gride/
+        {
+            if (gridedirection == 0)
+            {
+                if (grideCoolDown <= 0)
+                {
+                    if (Input.GetKey(KeyCode.LeftControl))
+                    {
+                        gridedirection = 1;
+                        grideCoolDown = startgrideCoolDown;
+                        animatorEligos.SetBool("IsGride", true);
+                    }
+                }
+                else
+                {
+                    grideCoolDown -= Time.deltaTime;
+                }
+            }
+            else
+            {
+                if (grideTime <= 0 || isGrounded)
+                {
+                    gridedirection = 0;
+                    grideTime = startgrideTime;
+                    rb.gravityScale = 3;
+                    animatorEligos.SetBool("IsGride", false);
+                }
+                else
+                {
+                    grideTime -= Time.deltaTime;
+                    if (gridedirection == 1)
+                    {
+                        rb.gravityScale = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    void ShowSkillLuminious()
+    {
+        DashCD_BW.SetActive(true);
+        DashCDGameObject.SetActive(true);
+        Stomp_BW.SetActive(true);
+        StompGameObject.SetActive(true);
+        Glide_BW.SetActive(false);
+        GlideGameObject.SetActive(false);
+        DoubleJump_BW.SetActive(false);
+        DoubleJumpGameObject.SetActive(false);
+    }
+
+    void ShowSkillEligos()
+    {
+        DashCD_BW.SetActive(false);
+        DashCDGameObject.SetActive(false);
+        Stomp_BW.SetActive(false);
+        StompGameObject.SetActive(false);
+        Glide_BW.SetActive(true);
+        GlideGameObject.SetActive(true);
+        DoubleJump_BW.SetActive(true);
+        DoubleJumpGameObject.SetActive(true);
     }
 
     void Flip()
@@ -189,17 +375,5 @@ public class SimpleMove : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
-    }
-
-    IEnumerator Dash (float direction)
-    {
-        isDashing = true;
-        rb.velocity = new Vector2(rb.velocity.x, 0f);
-        rb.AddForce(new Vector2(dashDistance * direction, 0f), ForceMode2D.Impulse);
-        float gravity = rb.gravityScale;
-        rb.gravityScale = 0;
-        yield return new WaitForSeconds(0.4f);
-        isDashing = false;
-        rb.gravityScale = gravity;
     }
 }
