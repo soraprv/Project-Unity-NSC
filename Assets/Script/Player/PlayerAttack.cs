@@ -32,16 +32,23 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] public LayerMask whatIsEnemies;
     [SerializeField] public LayerMask whatIsBoss;
 
+    [Header("Animator")]
+    public Animator animatorLunimous;
+    public Animator animatorEligos;
+
     void Update()
     {
         ForCheckDebugInBoss2Area = InBoss2Area;
         ForCheckDebugInBoss3Area = InBoss3Area;
         ForCheckDebugInBoss4Area = InBoss4Area;
 
-        if (timeBtwAttack <= startTimeBtwAttack)
+        if (timeBtwAttack <= 0)
         {
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
+                animatorLunimous.SetTrigger("Attack");
+                animatorEligos.SetTrigger("Attack");
+
                 if (InBoss2Area)
                 {
                     Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(
@@ -70,6 +77,7 @@ public class PlayerAttack : MonoBehaviour
                     for (int i = 0; i < enemiesToDamage.Length; i++)
                     {
                         enemiesToDamage[i].GetComponent<Boss3Move>().TakeDamage(damage);
+                        Debug.Log("Takedamage");
                     }
                 }
                 else if (InBoss4Area)
@@ -84,7 +92,7 @@ public class PlayerAttack : MonoBehaviour
                     );
                     for (int i = 0; i < enemiesToDamage.Length; i++)
                     {
-                        enemiesToDamage[i].GetComponent<Boss3Move>().TakeDamage(damage);
+                        enemiesToDamage[i].GetComponent<BossMove>().TakeDamage(damage);
                     }
                 }
                 else
@@ -102,13 +110,12 @@ public class PlayerAttack : MonoBehaviour
                         enemiesToDamage[i].GetComponent<EnemyJumping>().TakeDamage(damage);
                     }
                 }
-
+                timeBtwAttack = startTimeBtwAttack;
             }
-            timeBtwAttack = startTimeBtwAttack;
         }
         else
         {
-            timeBtwAttack = Time.deltaTime;
+            timeBtwAttack -= Time.deltaTime;
         }
     }
 
@@ -132,5 +139,4 @@ public class PlayerAttack : MonoBehaviour
              )
         );
     }
-
 }

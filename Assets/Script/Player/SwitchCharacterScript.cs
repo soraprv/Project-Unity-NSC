@@ -52,7 +52,6 @@ public class SwitchCharacterScript : MonoBehaviour {
 			avatar1.gameObject.SetActive (true);
 			avatar2.gameObject.SetActive (false);
 			break;
-		}
-			
+		}	
 	}
 }

@@ -20,7 +20,8 @@ public class UpgradeStatus : MonoBehaviour
     public GameObject Press;
     private bool check = false;
     public GameObject HP;
-    public GameObject Speed;
+    public GameObject LuminiousSpeed;
+    public GameObject EligosSpeed;
 
 
     void Start()
@@ -56,7 +57,8 @@ public class UpgradeStatus : MonoBehaviour
             player.constraints = RigidbodyConstraints2D.FreezeAll;
             Press.SetActive(false);
             HP.SetActive(true);
-            Speed.SetActive(true);
+            LuminiousSpeed.SetActive(true);
+            EligosSpeed.SetActive(true);
             QuitButton.SetActive(true);
         }
     }
@@ -69,7 +71,8 @@ public class UpgradeStatus : MonoBehaviour
         player.constraints = RigidbodyConstraints2D.FreezeRotation;
         
         HP.SetActive(false);
-        Speed.SetActive(false);
+        LuminiousSpeed.SetActive(false);
+        EligosSpeed.SetActive(false);
         QuitButton.SetActive(false);
 
     }

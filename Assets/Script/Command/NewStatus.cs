@@ -5,14 +5,16 @@ using UnityEngine;
 public class NewStatus : MonoBehaviour
 {
     public static bool GetNewMaxHealth;
-    public static bool GetNewSpeed;
+    public static bool GetNewLuminiusSpeed;
+    public static bool GetNewEligosSpeed;
     public static int plusHealth = 1;
     public static float plusSpeed = 1;
 
     private void Start()
     {
         GetNewMaxHealth = false;
-        GetNewSpeed = false;
+        GetNewLuminiusSpeed = false;
+        GetNewEligosSpeed = false;
     }
 
     public void UpHealthStatus()
@@ -24,11 +26,20 @@ public class NewStatus : MonoBehaviour
         }
     }
 
-    public void UpSpeedStatus()
+    public void UpSpeedLuminus()
     {
         if (PointSystem.Point > 0)
         {
-            GetNewSpeed = true;
+            GetNewLuminiusSpeed = true;
+            PointSystem.Point -= 1;
+        }
+    }
+
+    public void UpSpeedEligos()
+    {
+        if (PointSystem.Point > 0)
+        {
+            GetNewEligosSpeed = true;
             PointSystem.Point -= 1;
         }
     }
